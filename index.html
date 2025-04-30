@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <title>Yabu's Games</title>
   <link rel="stylesheet" href="style.css">
-
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script> <!-- Sicherstellen, dass Supabase zuerst geladen wird -->
 </head>
 
 <body>
@@ -37,7 +37,7 @@
       </div>
     </div>
   </div>
-
+  
   <style>
     /* Grundlegendes Styling */
     body { background-color: #0f1117; color: #fff; font-family: sans-serif; margin: 0; padding: 0; }
@@ -130,125 +130,125 @@
   </style>
 
 <!-- Erst Supabase laden -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+ <script>
+    // Sicherstellen, dass das Supabase-Skript geladen ist und initialisiert wird.
+    document.addEventListener("DOMContentLoaded", function() {
+      // Hier initialisieren wir Supabase korrekt.
+      const supabaseUrl = 'https://vxwkrjmyuxxunyzkocnt.supabase.co';  // Deine Supabase URL
+      const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4d2tyam15dXh4dW55emtvY250Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwMjMwNDQsImV4cCI6MjA2MTU5OTA0NH0.SA-zVGHZlxvFcHSvFFg2w7V0dT_e-yIGIc-BSEisySs';  // Dein Supabase Key
 
-<!-- Dann erst dein eigener Code, nachdem die Bibliothek verfügbar ist -->
-<script>
-  const supabaseUrl = 'https://vxwkrjmyuxxunyzkocnt.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4d2tyam15dXh4dW55emtvY250Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwMjMwNDQsImV4cCI6MjA2MTU5OTA0NH0.SA-zVGHZlxvFcHSvFFg2w7V0dT_e-yIGIc-BSEisySs'; // (öffentlicher Schlüssel)
-  const supabase = supabase.createClient(supabaseUrl, supabaseKey); // Jetzt korrekt!
+      // Jetzt erstellen wir den Supabase-Client:
+      const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-  // Der Rest deines Codes hier...
-document.addEventListener("DOMContentLoaded", () => {
-    const searchInput = document.querySelector(".search-input");
-    const gameGrid = document.getElementById("gameGrid");
-    const addButton = document.querySelector('.add-button');
-    const popup = document.getElementById('popup');
-    const closeBtn = document.getElementById('closePopup');
-    const submitBtn = document.getElementById('submitGame');
-    const deleteBtn = document.getElementById('deleteGame');
-    const inputName = document.getElementById('gameName');
-    const inputImg = document.getElementById('imageUrl');
-    const inputLink = document.getElementById('steamLink');
-    const popupTitle = document.getElementById('popupTitle');
+      // Deine Funktionalitäten beginnen hier
+      const searchInput = document.querySelector(".search-input");
+      const gameGrid = document.getElementById("gameGrid");
+      const addButton = document.querySelector('.add-button');
+      const popup = document.getElementById('popup');
+      const closeBtn = document.getElementById('closePopup');
+      const submitBtn = document.getElementById('submitGame');
+      const deleteBtn = document.getElementById('deleteGame');
+      const inputName = document.getElementById('gameName');
+      const inputImg = document.getElementById('imageUrl');
+      const inputLink = document.getElementById('steamLink');
+      const popupTitle = document.getElementById('popupTitle');
 
-    let editGameIndex = -1;
-    let savedGames = [];
+      let editGameIndex = -1;
+      let savedGames = [];
 
-    async function loadGames() {
-      const { data, error } = await supabase.from('games').select('*');
-      if (error) {
-        console.error("Fehler beim Laden der Spiele:", error);
-      } else {
-        savedGames = data;
-        renderGrid();
+      async function loadGames() {
+        const { data, error } = await supabase.from('games').select('*');
+        if (error) {
+          console.error("Fehler beim Laden der Spiele:", error);
+        } else {
+          savedGames = data;
+          renderGrid();
+        }
       }
-    }
 
-    function renderGrid() {
-      gameGrid.innerHTML = '';
-      savedGames.forEach((game, idx) => addGameCard(game, idx));
-    }
+      function renderGrid() {
+        gameGrid.innerHTML = '';
+        savedGames.forEach((game, idx) => addGameCard(game, idx));
+      }
 
-    function addGameCard({ id, name, img, link }, index) {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <a href="${link}" target="_blank"><img src="${img}" alt="${name}" onerror="this.src='https://via.placeholder.com/150';"></a>
-        <div class="card-info">
-          <h2>${name}</h2>
-          <button class="card-edit-btn" title="Bearbeiten">✎</button>
-        </div>
-      `;
-      const editBtn = card.querySelector('.card-edit-btn');
-      editBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        editGameIndex = index;
-        inputName.value = name;
-        inputImg.value = img;
-        inputLink.value = link;
-        popupTitle.textContent = 'Spiel bearbeiten';
-        deleteBtn.style.display = 'inline-block';
+      function addGameCard({ id, name, img, link }, index) {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <a href="${link}" target="_blank"><img src="${img}" alt="${name}" onerror="this.src='https://via.placeholder.com/150';"></a>
+          <div class="card-info">
+            <h2>${name}</h2>
+            <button class="card-edit-btn" title="Bearbeiten">✎</button>
+          </div>
+        `;
+        const editBtn = card.querySelector('.card-edit-btn');
+        editBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          editGameIndex = index;
+          inputName.value = name;
+          inputImg.value = img;
+          inputLink.value = link;
+          popupTitle.textContent = 'Spiel bearbeiten';
+          deleteBtn.style.display = 'inline-block';
+          popup.classList.remove('hidden');
+        });
+        gameGrid.appendChild(card);
+      }
+
+      addButton.addEventListener('click', () => {
+        editGameIndex = -1;
+        inputName.value = '';
+        inputImg.value = '';
+        inputLink.value = '';
+        popupTitle.textContent = 'Spiel hinzufügen';
+        deleteBtn.style.display = 'none';
         popup.classList.remove('hidden');
       });
-      gameGrid.appendChild(card);
-    }
 
-    addButton.addEventListener('click', () => {
-      editGameIndex = -1;
-      inputName.value = '';
-      inputImg.value = '';
-      inputLink.value = '';
-      popupTitle.textContent = 'Spiel hinzufügen';
-      deleteBtn.style.display = 'none';
-      popup.classList.remove('hidden');
-    });
+      closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
+      window.addEventListener('click', (e) => {
+        if (e.target === popup) popup.classList.add('hidden');
+      });
 
-    closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
-    window.addEventListener('click', (e) => {
-      if (e.target === popup) popup.classList.add('hidden');
-    });
-
-    submitBtn.addEventListener('click', async () => {
-      const name = inputName.value.trim();
-      const img = inputImg.value.trim();
-      const link = inputLink.value.trim();
-      if (!name || !img || !link) return alert('Bitte alle Felder ausfüllen!');
-      const gameData = { name, img, link };
-      if (editGameIndex >= 0) {
-        const game = savedGames[editGameIndex];
-        const { error } = await supabase.from('games').update(gameData).eq('id', game.id);
-        if (error) return alert('Fehler beim Aktualisieren des Spiels');
-      } else {
-        const { error } = await supabase.from('games').insert([gameData]);
-        if (error) return alert('Fehler beim Hinzufügen des Spiels');
-      }
-      popup.classList.add('hidden');
-      loadGames();
-    });
-
-    deleteBtn.addEventListener('click', async () => {
-      if (editGameIndex >= 0 && confirm('Möchtest du diese Karte wirklich löschen?')) {
-        const game = savedGames[editGameIndex];
-        const { error } = await supabase.from('games').delete().eq('id', game.id);
-        if (error) return alert('Fehler beim Löschen des Spiels');
+      submitBtn.addEventListener('click', async () => {
+        const name = inputName.value.trim();
+        const img = inputImg.value.trim();
+        const link = inputLink.value.trim();
+        if (!name || !img || !link) return alert('Bitte alle Felder ausfüllen!');
+        const gameData = { name, img, link };
+        if (editGameIndex >= 0) {
+          const game = savedGames[editGameIndex];
+          const { error } = await supabase.from('games').update(gameData).eq('id', game.id);
+          if (error) return alert('Fehler beim Aktualisieren des Spiels');
+        } else {
+          const { error } = await supabase.from('games').insert([gameData]);
+          if (error) return alert('Fehler beim Hinzufügen des Spiels');
+        }
         popup.classList.add('hidden');
         loadGames();
-      }
-    });
-
-    searchInput.addEventListener("input", () => {
-      const value = searchInput.value.toLowerCase();
-      document.querySelectorAll(".card").forEach(card => {
-        const title = card.querySelector("h2").textContent.toLowerCase();
-        card.style.display = title.includes(value) ? "block" : "none";
       });
-    });
 
-    loadGames();
-  });
-</script>
+      deleteBtn.addEventListener('click', async () => {
+        if (editGameIndex >= 0 && confirm('Möchtest du diese Karte wirklich löschen?')) {
+          const game = savedGames[editGameIndex];
+          const { error } = await supabase.from('games').delete().eq('id', game.id);
+          if (error) return alert('Fehler beim Löschen des Spiels');
+          popup.classList.add('hidden');
+          loadGames();
+        }
+      });
+
+      searchInput.addEventListener("input", () => {
+        const value = searchInput.value.toLowerCase();
+        document.querySelectorAll(".card").forEach(card => {
+          const title = card.querySelector("h2").textContent.toLowerCase();
+          card.style.display = title.includes(value) ? "block" : "none";
+        });
+      });
+
+      loadGames(); // Lade die Spiele nach dem Initialisieren von Supabase
+    });
+  </script>
 
 </body>
-
 </html>

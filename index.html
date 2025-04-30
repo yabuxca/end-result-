@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <title>Yabu's Games</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script> <!-- Sicherstellen, dass Supabase zuerst geladen wird -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script> <!-- Achte darauf, dass Supabase hier geladen wird -->
 </head>
 
 <body>
@@ -131,16 +131,15 @@
 
 <!-- Erst Supabase laden -->
  <script>
-    // Sicherstellen, dass das Supabase-Skript geladen ist und initialisiert wird.
-    document.addEventListener("DOMContentLoaded", function() {
-      // Hier initialisieren wir Supabase korrekt.
-      const supabaseUrl = 'https://vxwkrjmyuxxunyzkocnt.supabase.co';  // Deine Supabase URL
+    // Wir stellen sicher, dass der Code erst ausgeführt wird, nachdem die Supabase-Bibliothek geladen wurde
+    document.addEventListener("DOMContentLoaded", () => {
+      // Initialisiere Supabase hier, nachdem der DOM geladen wurde
+      const supabaseUrl = 'https://vxwkrjmyuxxunyzkocnt.supabase.co';
       const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4d2tyam15dXh4dW55emtvY250Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwMjMwNDQsImV4cCI6MjA2MTU5OTA0NH0.SA-zVGHZlxvFcHSvFFg2w7V0dT_e-yIGIc-BSEisySs';  // Dein Supabase Key
 
-      // Jetzt erstellen wir den Supabase-Client:
+      // Jetzt erstellen wir den Supabase-Client
       const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-      // Deine Funktionalitäten beginnen hier
       const searchInput = document.querySelector(".search-input");
       const gameGrid = document.getElementById("gameGrid");
       const addButton = document.querySelector('.add-button');

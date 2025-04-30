@@ -20,23 +20,17 @@
 
     // Firebase-Konfiguration
 
-    const firebaseConfig = {
+const firebaseConfig = {
+  apiKey: "AIzaSyCGRaPY9dSsBLzE1r8rtC-mKJDZ5czYmsA",
+  authDomain: "yabus-games.firebaseapp.com",
+  databaseURL: "https://yabus-games-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "yabus-games",
+  storageBucket: "yabus-games.firebasestorage.app",
+  messagingSenderId: "145419508657",
+  appId: "1:145419508657:web:dd9c4d8da4ffcbcf9f3b90",
+  measurementId: "G-0QKDQX9W4W"
+};
 
-      apiKey: "DEINE_API_KEY",
-
-      authDomain: "DEIN_PROJECT.firebaseapp.com",
-
-      databaseURL: "https://DEIN_PROJECT.firebaseio.com",
-
-      projectId: "DEIN_PROJECT",
-
-      storageBucket: "DEIN_PROJECT.appspot.com",
-
-      messagingSenderId: "...",
-
-      appId: "..."
-
-    };
 
     firebase.initializeApp(firebaseConfig);
 
@@ -97,11 +91,9 @@
         <button id="deleteGame" class="delete-btn">Löschen</button>
 
       </div>
-
     </div>
 
   </div>
-
 
 
   <style>
@@ -199,7 +191,8 @@
 
       const gamesRef = db.ref('games');
 
-
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
 
       // Daten aus Firebase laden
 

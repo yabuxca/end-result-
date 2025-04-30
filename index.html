@@ -42,7 +42,15 @@
     /* Grundlegendes Styling */
     body { background-color: #0f1117; color: #fff; font-family: sans-serif; margin: 0; padding: 0; }
 
-    header { display: flex; justify-content: space-between; padding: 1rem 2rem; background-color: #151821; align-items: center; }
+    header {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background-color: #151821;
+  align-items: center;
+  position: relative;       /* NEU */
+  z-index: 200;             /* NEU – über dem Popup */
+}
 
     nav button { background: #8f5ef2; border: none; color: white; padding: 0.7rem 1.2rem; border-radius: 12px; cursor: pointer; font-weight: bold; transition: background-color 0.3s; }
 

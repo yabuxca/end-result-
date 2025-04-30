@@ -165,7 +165,7 @@
 
 
 
-  <script>
+<script>
 
     document.addEventListener("DOMContentLoaded", () => {
 
@@ -191,11 +191,27 @@
 
       const popupTitle = document.getElementById('popupTitle');
 
-      
+
 
       let editGameIndex = -1;
 
-      let savedGames = JSON.parse(localStorage.getItem('games') || '[]');
+      let savedGames = [];
+
+      const gamesRef = db.ref('games');
+
+
+
+      // Daten aus Firebase laden
+
+      gamesRef.on('value', snapshot => {
+
+        const data = snapshot.val() || {};
+
+        savedGames = Object.entries(data).map(([id, val]) => ({ id, ...val }));
+
+        renderGrid();
+
+      });
 
 
 
@@ -209,7 +225,7 @@
 
 
 
-      function addGameCard({ name, img, link }, index) {
+      function addGameCard({ id, name, img, link }, index) {
 
         const card = document.createElement('div');
 
@@ -217,7 +233,7 @@
 
         card.innerHTML = `
 
-           <a href="${link}" target="_blank"><img src="${img}" alt="${name}"></a>
+          <a href="${link}" target="_blank"><img src="${img}" alt="${name}"></a>
 
           <div class="card-info">
 
@@ -237,13 +253,11 @@
 
           editGameIndex = index;
 
-          const gameToEdit = savedGames[index];
+          inputName.value = name;
 
-          inputName.value = gameToEdit.name;
+          inputImg.value = img;
 
-          inputImg.value = gameToEdit.img;
-
-          inputLink.value = gameToEdit.link;
+          inputLink.value = link;
 
           popupTitle.textContent = 'Spiel bearbeiten';
 
@@ -258,6 +272,8 @@
       }
 
 
+
+      // Hinzufügen
 
       addButton.addEventListener('click', () => {
 
@@ -283,25 +299,33 @@
 
 
 
+      // Speichern (Create oder Update)
+
       submitBtn.addEventListener('click', () => {
 
         const name = inputName.value.trim();
 
-        const img = inputImg.value.trim();
+        const img  = inputImg.value.trim();
 
         const link = inputLink.value.trim();
 
         if (!name || !img || !link) return alert('Bitte alle Felder ausfüllen!');
 
-        const newGame = { name, img, link };
 
-        if (editGameIndex >= 0) savedGames[editGameIndex] = newGame;
 
-        else savedGames.push(newGame);
+        const gameData = { name, img, link };
 
-        localStorage.setItem('games', JSON.stringify(savedGames));
+        if (editGameIndex >= 0) {
 
-        renderGrid();
+          const game = savedGames[editGameIndex];
+
+          gamesRef.child(game.id).set(gameData);
+
+        } else {
+
+          gamesRef.push(gameData);
+
+        }
 
         popup.classList.add('hidden');
 
@@ -309,15 +333,15 @@
 
 
 
+      // Löschen
+
       deleteBtn.addEventListener('click', () => {
 
         if (editGameIndex >= 0 && confirm('Möchtest du diese Karte wirklich löschen?')) {
 
-          savedGames.splice(editGameIndex, 1);
+          const game = savedGames[editGameIndex];
 
-          localStorage.setItem('games', JSON.stringify(savedGames));
-
-          renderGrid();
+          gamesRef.child(game.id).remove();
 
           popup.classList.add('hidden');
 
@@ -326,6 +350,8 @@
       });
 
 
+
+      // Suche
 
       searchInput.addEventListener("input", () => {
 
@@ -341,14 +367,9 @@
 
       });
 
-
-
-      renderGrid();
-
     });
 
   </script>
-
 
 </body>
 

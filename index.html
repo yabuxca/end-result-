@@ -129,15 +129,17 @@
     }
   </style>
 
-<!-- Supabase einbinden und Initialisierung -->
+<!-- Erst Supabase laden -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script>
-  // Supabase-Projekt-URL und API-Schlüssel (ERSÄTZE DIESE!)
-  const supabaseUrl = 'https://vxwkrjmyuxxunyzkocnt.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4d2tyam15dXh4dW55emtvY250Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwMjMwNDQsImV4cCI6MjA2MTU5OTA0NH0.SA-zVGHZlxvFcHSvFFg2w7V0dT_e-yIGIc-BSEisySs'; // nur der öffentliche Key!
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  document.addEventListener("DOMContentLoaded", () => {
+<!-- Dann erst dein eigener Code, nachdem die Bibliothek verfügbar ist -->
+<script>
+  const supabaseUrl = 'https://vxwkrjmyuxxunyzkocnt.supabase.co';
+  const supabaseKey = 'eyJh...'; // (öffentlicher Schlüssel)
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey); // Jetzt korrekt!
+
+  // Der Rest deines Codes hier...
+document.addEventListener("DOMContentLoaded", () => {
     const searchInput = document.querySelector(".search-input");
     const gameGrid = document.getElementById("gameGrid");
     const addButton = document.querySelector('.add-button');
@@ -246,7 +248,6 @@ const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     loadGames();
   });
 </script>
-
 
 </body>
 

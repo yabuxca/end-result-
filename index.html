@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html lang="de">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>Yabu's Games</title>
+
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+  <header>
+
+    <h1>Yabu's Games</h1>
+
+    <nav>
+
+      <button class="add-button">Hinzufügen</button>
+
+    </nav>
+
+  </header>
+
+
+
+  <section class="filter-section">
+
+    <input type="text" placeholder="🔍 Suche" class="search-input"/>
+
+  </section>
+
+
+
+  <main class="game-grid" id="gameGrid"></main>
+
+
+
+  <!-- Ein einziges Popup Modal -->
+
+  <div class="popup hidden" id="popup">
+
+    <div class="popup-content">
+
+      <span id="closePopup" class="close-btn">×</span>
+
+      <h2 id="popupTitle">Spiel hinzufügen</h2>
+
+      <input type="text" id="gameName" placeholder="Spielname" />
+
+      <input type="text" id="imageUrl" placeholder="Bild-URL" />
+
+      <input type="text" id="steamLink" placeholder="Steam Link" />
+
+      <div class="edit-form__buttons">
+
+        <button id="submitGame" class="save-btn">Speichern</button>
+
+        <button id="deleteGame" class="delete-btn">Löschen</button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <style>
+
+    /* Grundlegendes Styling */
+
+    body { background-color: #0f1117; color: #fff; font-family: sans-serif; margin: 0; padding: 0; }
+
+    header { display: flex; justify-content: space-between; padding: 1rem 2rem; background-color: #151821; align-items: center; }
+
+    nav button { background: #8f5ef2; border: none; color: white; padding: 0.7rem 1.2rem; border-radius: 12px; cursor: pointer; font-weight: bold; transition: background-color 0.3s; }
+
+    nav button:hover { background-color: #7a4ee1; }
+
+    .filter-section { padding: 1rem 2rem; }
+
+    .filter-section input { padding: 0.6rem 1rem; border-radius: 2rem; border: 1px solid #ccc; font-size: 1rem; width: 100%; max-width: 600px; background-color: #1d1f29; color: white; transition: border-color 0.3s; }
+
+    .filter-section input:focus { border-color: #8f5ef2; outline: none; }
+
+    .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; padding: 2rem; }
+
+    .card { background: #1d1f29; border-radius: 12px; overflow: hidden; transition: transform 0.2s ease; display: flex; flex-direction: column; position: relative; }
+
+    .card img { width: 100%; height: auto; object-fit: contain; transition: transform 0.3s ease; }
+
+    .card:hover img { transform: scale(1.05); }
+
+    .card-info { padding: 1rem; display: flex; flex-direction: column; flex: 1; position: relative; }
+
+    .card-edit-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #8f5ef2; font-size: 1.2rem; cursor: pointer; }
+
+    .card-edit-btn:hover { color: #7a4ee1; }
+
+    .popup { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; pointer-events: all; z-index: 100; }
+
+    .popup.hidden { display: none; pointer-events: none; }
+
+    .popup-content { position: relative; background: #1d1f29; padding: 2rem; border-radius:12px; width:300px; display:flex; flex-direction:column; gap:1rem; }
+
+    .popup-content input, .popup-content button { padding:0.5rem; border-radius:8px; font-size:1rem; border:none; }
+
+    .save-btn { background:#8f5ef2; color:white; font-weight:bold; }
+
+    .save-btn:hover { background:#7a4ee1; }
+
+    .delete-btn { background:#ff4d4d; color:white; font-weight:bold; }
+
+    .delete-btn:hover { background:#e04444; }
+
+    .close-btn { position:absolute; top:10px; right:10px; font-size:1.5rem; color:white; cursor:pointer; }
+
+    .close-btn:hover { color:#8f5ef2; }
+/* Card Hover Effekt */
+.card:hover {
+  border: 2px solid #8f5ef2; /* Lila Rand */
+  transform: scale(1.05); /* Etwas vergrößern beim Hover */
+}
+
+  </style>
+
+
+
+  <script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+      const searchInput = document.querySelector(".search-input");
+
+      const gameGrid = document.getElementById("gameGrid");
+
+      const addButton = document.querySelector('.add-button');
+
+      const popup = document.getElementById('popup');
+
+      const closeBtn = document.getElementById('closePopup');
+
+      const submitBtn = document.getElementById('submitGame');
+
+      const deleteBtn = document.getElementById('deleteGame');
+
+      const inputName = document.getElementById('gameName');
+
+      const inputImg = document.getElementById('imageUrl');
+
+      const inputLink = document.getElementById('steamLink');
+
+      const popupTitle = document.getElementById('popupTitle');
+
+      
+
+      let editGameIndex = -1;
+
+      let savedGames = JSON.parse(localStorage.getItem('games') || '[]');
+
+
+
+      function renderGrid() {
+
+        gameGrid.innerHTML = '';
+
+        savedGames.forEach((game, idx) => addGameCard(game, idx));
+
+      }
+
+
+
+      function addGameCard({ name, img, link }, index) {
+
+        const card = document.createElement('div');
+
+        card.className = 'card';
+
+        card.innerHTML = `
+
+           <a href="${link}" target="_blank"><img src="${img}" alt="${name}"></a>
+
+          <div class="card-info">
+
+            <h2>${name}</h2>
+
+            <button class="card-edit-btn" title="Bearbeiten">✎</button>
+
+          </div>
+
+        `;
+
+        const editBtn = card.querySelector('.card-edit-btn');
+
+        editBtn.addEventListener('click', e => {
+
+          e.stopPropagation();
+
+          editGameIndex = index;
+
+          const gameToEdit = savedGames[index];
+
+          inputName.value = gameToEdit.name;
+
+          inputImg.value = gameToEdit.img;
+
+          inputLink.value = gameToEdit.link;
+
+          popupTitle.textContent = 'Spiel bearbeiten';
+
+          deleteBtn.style.display = 'inline-block';
+
+          popup.classList.remove('hidden');
+
+        });
+
+        gameGrid.appendChild(card);
+
+      }
+
+
+
+      addButton.addEventListener('click', () => {
+
+        editGameIndex = -1;
+
+        inputName.value = '';
+
+        inputImg.value = '';
+
+        inputLink.value = '';
+
+        popupTitle.textContent = 'Spiel hinzufügen';
+
+        deleteBtn.style.display = 'none';
+
+        popup.classList.remove('hidden');
+
+      });
+
+
+
+      closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
+
+
+
+      submitBtn.addEventListener('click', () => {
+
+        const name = inputName.value.trim();
+
+        const img = inputImg.value.trim();
+
+        const link = inputLink.value.trim();
+
+        if (!name || !img || !link) return alert('Bitte alle Felder ausfüllen!');
+
+        const newGame = { name, img, link };
+
+        if (editGameIndex >= 0) savedGames[editGameIndex] = newGame;
+
+        else savedGames.push(newGame);
+
+        localStorage.setItem('games', JSON.stringify(savedGames));
+
+        renderGrid();
+
+        popup.classList.add('hidden');
+
+      });
+
+
+
+      deleteBtn.addEventListener('click', () => {
+
+        if (editGameIndex >= 0 && confirm('Möchtest du diese Karte wirklich löschen?')) {
+
+          savedGames.splice(editGameIndex, 1);
+
+          localStorage.setItem('games', JSON.stringify(savedGames));
+
+          renderGrid();
+
+          popup.classList.add('hidden');
+
+        }
+
+      });
+
+
+
+      searchInput.addEventListener("input", () => {
+
+        const value = searchInput.value.toLowerCase();
+
+        document.querySelectorAll(".card").forEach(card => {
+
+          const title = card.querySelector("h2").textContent.toLowerCase();
+
+          card.style.display = title.includes(value) ? "block" : "none";
+
+        });
+
+      });
+
+
+
+      renderGrid();
+
+    });
+
+  </script>
+
+</body>
+
+</html>

@@ -95,162 +95,124 @@
     }
   </style>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const searchInput = document.querySelector(".search-input");
-      const gameGrid = document.getElementById("gameGrid");
-      const addButton = document.querySelector('.add-button');
-      const popup = document.getElementById('popup');
-      const closeBtn = document.getElementById('closePopup');
-      const submitBtn = document.getElementById('submitGame');
-      const deleteBtn = document.getElementById('deleteGame');
-      const inputName = document.getElementById('gameName');
-      const inputImg = document.getElementById('imageUrl');
-      const inputLink = document.getElementById('steamLink');
-      const popupTitle = document.getElementById('popupTitle');
+<!-- Supabase einbinden und Initialisierung -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script>
+  // Supabase-Projekt-URL und API-Schlüssel (ERSÄTZE DIESE!)
+  const supabaseUrl = 'https://your-project.supabase.co';
+  const supabaseKey = 'public-anon-key'; // nur der öffentliche Key!
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-      let editGameIndex = -1;
-      let savedGames = [];
+  document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.querySelector(".search-input");
+    const gameGrid = document.getElementById("gameGrid");
+    const addButton = document.querySelector('.add-button');
+    const popup = document.getElementById('popup');
+    const closeBtn = document.getElementById('closePopup');
+    const submitBtn = document.getElementById('submitGame');
+    const deleteBtn = document.getElementById('deleteGame');
+    const inputName = document.getElementById('gameName');
+    const inputImg = document.getElementById('imageUrl');
+    const inputLink = document.getElementById('steamLink');
+    const popupTitle = document.getElementById('popupTitle');
 
-      // Daten aus Supabase laden
-      async function loadGames() {
-        const { data, error } = await supabase
-          .from('games')
-          .select('*');
+    let editGameIndex = -1;
+    let savedGames = [];
 
-        if (error) {
-          console.error("Fehler beim Laden der Spiele:", error);
-        } else {
-          savedGames = data;
-          renderGrid();
-        }
+    async function loadGames() {
+      const { data, error } = await supabase.from('games').select('*');
+      if (error) {
+        console.error("Fehler beim Laden der Spiele:", error);
+      } else {
+        savedGames = data;
+        renderGrid();
       }
+    }
 
-      // Daten anzeigen
-      function renderGrid() {
-        gameGrid.innerHTML = '';
-        savedGames.forEach((game, idx) => addGameCard(game, idx));
-      }
+    function renderGrid() {
+      gameGrid.innerHTML = '';
+      savedGames.forEach((game, idx) => addGameCard(game, idx));
+    }
 
-      // Spielekarte hinzufügen
-      function addGameCard({ id, name, img, link }, index) {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <a href="${link}" target="_blank"><img src="${img}" alt="${name}" onerror="this.src='https://via.placeholder.com/150';"></a>
-          <div class="card-info">
-            <h2>${name}</h2>
-            <button class="card-edit-btn" title="Bearbeiten">✎</button>
-          </div>
-        `;
-        
-        const editBtn = card.querySelector('.card-edit-btn');
-        editBtn.addEventListener('click', e => {
-          e.stopPropagation();
-          editGameIndex = index;
-          inputName.value = name;
-          inputImg.value = img;
-          inputLink.value = link;
-          popupTitle.textContent = 'Spiel bearbeiten';
-          deleteBtn.style.display = 'inline-block';
-          popup.classList.remove('hidden');
-        });
-
-        gameGrid.appendChild(card);
-      }
-
-      // Hinzufügen Button
-      addButton.addEventListener('click', () => {
-        editGameIndex = -1;
-        inputName.value = '';
-        inputImg.value = '';
-        inputLink.value = '';
-        popupTitle.textContent = 'Spiel hinzufügen';
-        deleteBtn.style.display = 'none';
+    function addGameCard({ id, name, img, link }, index) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <a href="${link}" target="_blank"><img src="${img}" alt="${name}" onerror="this.src='https://via.placeholder.com/150';"></a>
+        <div class="card-info">
+          <h2>${name}</h2>
+          <button class="card-edit-btn" title="Bearbeiten">✎</button>
+        </div>
+      `;
+      const editBtn = card.querySelector('.card-edit-btn');
+      editBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        editGameIndex = index;
+        inputName.value = name;
+        inputImg.value = img;
+        inputLink.value = link;
+        popupTitle.textContent = 'Spiel bearbeiten';
+        deleteBtn.style.display = 'inline-block';
         popup.classList.remove('hidden');
       });
+      gameGrid.appendChild(card);
+    }
 
-      // Popup schließen
-      closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
-      
-      // Klick außerhalb des Popups schließt es ebenfalls
-      window.addEventListener('click', (e) => {
-        if (e.target === popup) {
-          popup.classList.add('hidden');
-        }
-      });
-
-      // Speichern (Create oder Update)
-      submitBtn.addEventListener('click', async () => {
-        const name = inputName.value.trim();
-        const img  = inputImg.value.trim();
-        const link = inputLink.value.trim();
-
-        if (!name || !img || !link) return alert('Bitte alle Felder ausfüllen!');
-
-        const gameData = { name, img, link };
-
-        if (editGameIndex >= 0) {
-          const game = savedGames[editGameIndex];
-          const { error } = await supabase
-            .from('games')
-            .update(gameData)
-            .eq('id', game.id);
-          if (error) {
-            alert('Fehler beim Aktualisieren des Spiels');
-          }
-        } else {
-          const { error } = await supabase
-            .from('games')
-            .insert([gameData]);
-          if (error) {
-            alert('Fehler beim Hinzufügen des Spiels');
-          }
-        }
-
-        popup.classList.add('hidden');
-        loadGames(); // Neu laden, um die Liste zu aktualisieren
-      });
-
-      // Löschen
-      deleteBtn.addEventListener('click', async () => {
-        if (editGameIndex >= 0 && confirm('Möchtest du diese Karte wirklich löschen?')) {
-          const game = savedGames[editGameIndex];
-          const { error } = await supabase
-            .from('games')
-            .delete()
-            .eq('id', game.id);
-          
-          if (error) {
-            alert('Fehler beim Löschen des Spiels');
-          }
-
-          popup.classList.add('hidden');
-          loadGames(); // Neu laden, um die Liste zu aktualisieren
-        }
-      });
-
-      // Suche
-      searchInput.addEventListener("input", () => {
-        const value = searchInput.value.toLowerCase();
-        document.querySelectorAll(".card").forEach(card => {
-          const title = card.querySelector("h2").textContent.toLowerCase();
-          card.style.display = title.includes(value) ? "block" : "none";
-        });
-      });
-
-      // Initiales Laden der Spiele
-      loadGames();
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
-  <script>
-    // Supabase Client Initialisierung
-    const supabaseUrl = 'https://vxwkrjmyuxxunyzkocnt.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4d2tyam15dXh4dW55emtvY250Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwMjMwNDQsImV4cCI6MjA2MTU5OTA0NH0.SA-zVGHZlxvFcHSvFFg2w7V0dT_e-yIGIc-BSEisySs';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    addButton.addEventListener('click', () => {
+      editGameIndex = -1;
+      inputName.value = '';
+      inputImg.value = '';
+      inputLink.value = '';
+      popupTitle.textContent = 'Spiel hinzufügen';
+      deleteBtn.style.display = 'none';
+      popup.classList.remove('hidden');
     });
-  </script>
+
+    closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
+    window.addEventListener('click', (e) => {
+      if (e.target === popup) popup.classList.add('hidden');
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      const name = inputName.value.trim();
+      const img = inputImg.value.trim();
+      const link = inputLink.value.trim();
+      if (!name || !img || !link) return alert('Bitte alle Felder ausfüllen!');
+      const gameData = { name, img, link };
+      if (editGameIndex >= 0) {
+        const game = savedGames[editGameIndex];
+        const { error } = await supabase.from('games').update(gameData).eq('id', game.id);
+        if (error) return alert('Fehler beim Aktualisieren des Spiels');
+      } else {
+        const { error } = await supabase.from('games').insert([gameData]);
+        if (error) return alert('Fehler beim Hinzufügen des Spiels');
+      }
+      popup.classList.add('hidden');
+      loadGames();
+    });
+
+    deleteBtn.addEventListener('click', async () => {
+      if (editGameIndex >= 0 && confirm('Möchtest du diese Karte wirklich löschen?')) {
+        const game = savedGames[editGameIndex];
+        const { error } = await supabase.from('games').delete().eq('id', game.id);
+        if (error) return alert('Fehler beim Löschen des Spiels');
+        popup.classList.add('hidden');
+        loadGames();
+      }
+    });
+
+    searchInput.addEventListener("input", () => {
+      const value = searchInput.value.toLowerCase();
+      document.querySelectorAll(".card").forEach(card => {
+        const title = card.querySelector("h2").textContent.toLowerCase();
+        card.style.display = title.includes(value) ? "block" : "none";
+      });
+    });
+
+    loadGames();
+  });
+</script>
+
 
 </body>
 

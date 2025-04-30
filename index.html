@@ -150,7 +150,7 @@
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
-          <a href="${link}" target="_blank"><img src="${img}" alt="${name}"></a>
+          <a href="${link}" target="_blank"><img src="${img}" alt="${name}" onerror="this.src='https://via.placeholder.com/150';"></a>
           <div class="card-info">
             <h2>${name}</h2>
             <button class="card-edit-btn" title="Bearbeiten">✎</button>
@@ -185,6 +185,13 @@
 
       // Popup schließen
       closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
+      
+      // Klick außerhalb des Popups schließt es ebenfalls
+      window.addEventListener('click', (e) => {
+        if (e.target === popup) {
+          popup.classList.add('hidden');
+        }
+      });
 
       // Speichern (Create oder Update)
       submitBtn.addEventListener('click', async () => {
@@ -198,14 +205,20 @@
 
         if (editGameIndex >= 0) {
           const game = savedGames[editGameIndex];
-          await supabase
+          const { error } = await supabase
             .from('games')
             .update(gameData)
             .eq('id', game.id);
+          if (error) {
+            alert('Fehler beim Aktualisieren des Spiels');
+          }
         } else {
-          await supabase
+          const { error } = await supabase
             .from('games')
             .insert([gameData]);
+          if (error) {
+            alert('Fehler beim Hinzufügen des Spiels');
+          }
         }
 
         popup.classList.add('hidden');
@@ -216,10 +229,14 @@
       deleteBtn.addEventListener('click', async () => {
         if (editGameIndex >= 0 && confirm('Möchtest du diese Karte wirklich löschen?')) {
           const game = savedGames[editGameIndex];
-          await supabase
+          const { error } = await supabase
             .from('games')
             .delete()
             .eq('id', game.id);
+          
+          if (error) {
+            alert('Fehler beim Löschen des Spiels');
+          }
 
           popup.classList.add('hidden');
           loadGames(); // Neu laden, um die Liste zu aktualisieren

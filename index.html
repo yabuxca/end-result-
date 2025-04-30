@@ -1,42 +1,19 @@
 <!DOCTYPE html>
-
 <html lang="de">
 
 <head>
-
   <meta charset="UTF-8">
-
   <title>Yabu's Games</title>
-
   <link rel="stylesheet" href="style.css">
 
-  <!-- Firebase SDK -->
-
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
   <script>
-
-    // Firebase-Konfiguration
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCGRaPY9dSsBLzE1r8rtC-mKJDZ5czYmsA",
-  authDomain: "yabus-games.firebaseapp.com",
-  databaseURL: "https://yabus-games-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "yabus-games",
-  storageBucket: "yabus-games.firebasestorage.app",
-  messagingSenderId: "145419508657",
-  appId: "1:145419508657:web:dd9c4d8da4ffcbcf9f3b90",
-  measurementId: "G-0QKDQX9W4W"
-};
-
-
-    firebase.initializeApp(firebaseConfig);
-
-    const db = firebase.database();
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+    // Supabase-Konfiguration
+    const supabaseUrl = 'https://your-project.supabase.co'; // Ersetze durch deine Supabase URL
+    const supabaseKey = 'your-anon-key'; // Ersetze durch deinen Anonymen API Key
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
   </script>
 
 </head>
@@ -44,56 +21,31 @@ const analytics = getAnalytics(app);
 <body>
 
   <header>
-
     <h1>Yabu's Games</h1>
-
     <nav>
-
       <button class="add-button">Hinzufügen</button>
-
     </nav>
-
   </header>
 
-
-
   <section class="filter-section">
-
     <input type="text" placeholder="🔍 Suche" class="search-input"/>
-
   </section>
-
-
 
   <main class="game-grid" id="gameGrid"></main>
 
-
-
   <!-- Popup Modal -->
-
   <div class="popup hidden" id="popup">
-
     <div class="popup-content">
-
       <span id="closePopup" class="close-btn">×</span>
-
       <h2 id="popupTitle">Spiel hinzufügen</h2>
-
       <input type="text" id="gameName" placeholder="Spielname" />
-
       <input type="text" id="imageUrl" placeholder="Bild-URL" />
-
       <input type="text" id="steamLink" placeholder="Steam Link" />
-
       <div class="edit-form__buttons">
-
         <button id="submitGame" class="save-btn">Speichern</button>
-
         <button id="deleteGame" class="delete-btn">Löschen</button>
-
       </div>
     </div>
-
   </div>
 
 
@@ -159,210 +111,135 @@ const analytics = getAnalytics(app);
 
 
 <script>
-
     document.addEventListener("DOMContentLoaded", () => {
-
       const searchInput = document.querySelector(".search-input");
-
       const gameGrid = document.getElementById("gameGrid");
-
       const addButton = document.querySelector('.add-button');
-
       const popup = document.getElementById('popup');
-
       const closeBtn = document.getElementById('closePopup');
-
       const submitBtn = document.getElementById('submitGame');
-
       const deleteBtn = document.getElementById('deleteGame');
-
       const inputName = document.getElementById('gameName');
-
       const inputImg = document.getElementById('imageUrl');
-
       const inputLink = document.getElementById('steamLink');
-
       const popupTitle = document.getElementById('popupTitle');
 
-
-
       let editGameIndex = -1;
-
       let savedGames = [];
 
-      const gamesRef = db.ref('games');
+      // Daten aus Supabase laden
+      async function loadGames() {
+        const { data, error } = await supabase
+          .from('games')
+          .select('*');
 
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-
-      // Daten aus Firebase laden
-
-      gamesRef.on('value', snapshot => {
-
-        const data = snapshot.val() || {};
-
-        savedGames = Object.entries(data).map(([id, val]) => ({ id, ...val }));
-
-        renderGrid();
-
-      });
-
-
-
-      function renderGrid() {
-
-        gameGrid.innerHTML = '';
-
-        savedGames.forEach((game, idx) => addGameCard(game, idx));
-
+        if (error) {
+          console.error("Fehler beim Laden der Spiele:", error);
+        } else {
+          savedGames = data;
+          renderGrid();
+        }
       }
 
+      // Daten anzeigen
+      function renderGrid() {
+        gameGrid.innerHTML = '';
+        savedGames.forEach((game, idx) => addGameCard(game, idx));
+      }
 
-
+      // Spielekarte hinzufügen
       function addGameCard({ id, name, img, link }, index) {
-
         const card = document.createElement('div');
-
         card.className = 'card';
-
         card.innerHTML = `
-
           <a href="${link}" target="_blank"><img src="${img}" alt="${name}"></a>
-
           <div class="card-info">
-
             <h2>${name}</h2>
-
             <button class="card-edit-btn" title="Bearbeiten">✎</button>
-
           </div>
-
         `;
-
+        
         const editBtn = card.querySelector('.card-edit-btn');
-
         editBtn.addEventListener('click', e => {
-
           e.stopPropagation();
-
           editGameIndex = index;
-
           inputName.value = name;
-
           inputImg.value = img;
-
           inputLink.value = link;
-
           popupTitle.textContent = 'Spiel bearbeiten';
-
           deleteBtn.style.display = 'inline-block';
-
           popup.classList.remove('hidden');
-
         });
 
         gameGrid.appendChild(card);
-
       }
 
-
-
-      // Hinzufügen
-
+      // Hinzufügen Button
       addButton.addEventListener('click', () => {
-
         editGameIndex = -1;
-
         inputName.value = '';
-
         inputImg.value = '';
-
         inputLink.value = '';
-
         popupTitle.textContent = 'Spiel hinzufügen';
-
         deleteBtn.style.display = 'none';
-
         popup.classList.remove('hidden');
-
       });
 
-
-
+      // Popup schließen
       closeBtn.addEventListener('click', () => popup.classList.add('hidden'));
 
-
-
       // Speichern (Create oder Update)
-
-      submitBtn.addEventListener('click', () => {
-
+      submitBtn.addEventListener('click', async () => {
         const name = inputName.value.trim();
-
         const img  = inputImg.value.trim();
-
         const link = inputLink.value.trim();
 
         if (!name || !img || !link) return alert('Bitte alle Felder ausfüllen!');
 
-
-
         const gameData = { name, img, link };
 
         if (editGameIndex >= 0) {
-
           const game = savedGames[editGameIndex];
-
-          gamesRef.child(game.id).set(gameData);
-
+          await supabase
+            .from('games')
+            .update(gameData)
+            .eq('id', game.id);
         } else {
-
-          gamesRef.push(gameData);
-
+          await supabase
+            .from('games')
+            .insert([gameData]);
         }
 
         popup.classList.add('hidden');
-
+        loadGames(); // Neu laden, um die Liste zu aktualisieren
       });
-
-
 
       // Löschen
-
-      deleteBtn.addEventListener('click', () => {
-
+      deleteBtn.addEventListener('click', async () => {
         if (editGameIndex >= 0 && confirm('Möchtest du diese Karte wirklich löschen?')) {
-
           const game = savedGames[editGameIndex];
-
-          gamesRef.child(game.id).remove();
+          await supabase
+            .from('games')
+            .delete()
+            .eq('id', game.id);
 
           popup.classList.add('hidden');
-
+          loadGames(); // Neu laden, um die Liste zu aktualisieren
         }
-
       });
-
-
 
       // Suche
-
       searchInput.addEventListener("input", () => {
-
         const value = searchInput.value.toLowerCase();
-
         document.querySelectorAll(".card").forEach(card => {
-
           const title = card.querySelector("h2").textContent.toLowerCase();
-
           card.style.display = title.includes(value) ? "block" : "none";
-
         });
-
       });
 
+      // Initiales Laden der Spiele
+      loadGames();
     });
-
   </script>
 
 </body>

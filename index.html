@@ -6,15 +6,13 @@
   <title>Yabu's Games</title>
   <link rel="stylesheet" href="style.css">
 
-  <!-- Supabase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script>
+  const supabaseUrl = 'https://vxwkrjmyuxxunyzkocnt.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4d2tyam15dXh4dW55emtvY250Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwMjMwNDQsImV4cCI6MjA2MTU5OTA0NH0.SA-zVGHZlxvFcHSvFFg2w7V0dT_e-yIGIc-BSEisySs';
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+</script>
 
-  <script>
-    // Supabase-Konfiguration
-    const supabaseUrl = 'https://vxwkrjmyuxxunyzkocnt.supabase.co'; // Ersetze durch deine Supabase URL
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4d2tyam15dXh4dW55emtvY250Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwMjMwNDQsImV4cCI6MjA2MTU5OTA0NH0.SA-zVGHZlxvFcHSvFFg2w7V0dT_e-yIGIc-BSEisySs'; // Ersetze durch deinen Anonymen API Key
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-  </script>
 
 </head>
 

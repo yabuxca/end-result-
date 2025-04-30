@@ -315,6 +315,26 @@
 
   </script>
 
+<!-- Firebase App (must) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<!-- Firebase Realtime Database -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<script>
+  // Deine Project-Config hier einfügen:
+  const firebaseConfig = {
+    apiKey: "DEINE_API_KEY",
+    authDomain: "DEIN_PROJECT.firebaseapp.com",
+    databaseURL: "https://DEIN_PROJECT.firebaseio.com",
+    projectId: "DEIN_PROJECT",
+    storageBucket: "DEIN_PROJECT.appspot.com",
+    messagingSenderId: "…",
+    appId: "…"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
+
 </body>
 
 </html>

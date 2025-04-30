@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <title>Yabu's Games</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script> <!-- Achte darauf, dass Supabase hier geladen wird -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 
 <body>
@@ -37,33 +37,14 @@
       </div>
     </div>
   </div>
-  
+
   <style>
     /* Grundlegendes Styling */
     body { background-color: #0f1117; color: #fff; font-family: sans-serif; margin: 0; padding: 0; }
 
-    header {
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem 2rem;
-  background-color: #151821;
-  align-items: center;
-  position: relative;       /* NEU */
-  z-index: 200;             /* NEU – über dem Popup */
-}
+    header { display: flex; justify-content: space-between; padding: 1rem 2rem; background-color: #151821; align-items: center; }
 
-    nav button {
-  background: #8f5ef2;
-  border: none;
-  color: white;
-  padding: 0.7rem 1.2rem;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s;
-  position: relative;       /* NEU */
-  z-index: 201;             /* NEU – sicherstellen, dass es ganz oben ist */
-}
+    nav button { background: #8f5ef2; border: none; color: white; padding: 0.7rem 1.2rem; border-radius: 12px; cursor: pointer; font-weight: bold; transition: background-color 0.3s; }
 
     nav button:hover { background-color: #7a4ee1; }
 
@@ -87,26 +68,9 @@
 
     .card-edit-btn:hover { color: #7a4ee1; }
 
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  pointer-events: all;
-  z-index: 100;
-}
+    .popup { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; pointer-events: all; z-index: 100; }
 
-.popup.hidden {
-  display: none;
-  pointer-events: none;
-}
-
-
+    .popup.hidden { display: none; pointer-events: none; }
 
     .popup-content { position: relative; background: #1d1f29; padding: 2rem; border-radius:12px; width:300px; display:flex; flex-direction:column; gap:1rem; }
 
@@ -119,7 +83,9 @@
     .delete-btn { background:#ff4d4d; color:white; font-weight:bold; }
 
     .delete-btn:hover { background:#e04444; }
+
     .close-btn { position:absolute; top:10px; right:10px; font-size:1.5rem; color:white; cursor:pointer; }
+
     .close-btn:hover { color:#8f5ef2; }
 
     /* Card Hover Effekt */
@@ -130,15 +96,12 @@
   </style>
 
   <script>
-    // Wir stellen sicher, dass der Code erst ausgeführt wird, nachdem die Supabase-Bibliothek geladen wurde
+    // Supabase-Projekt-URL und API-Schlüssel (ENSURE THESE ARE CORRECT!)
+    const supabaseUrl = 'https://vxwkrjmyuxxunyzkocnt.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4d2tyam15dXh4dW55emtvY250Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwMjMwNDQsImV4cCI6MjA2MTU5OTA0NH0.SA-zVGHZlxvFcHSvFFg2w7V0dT_e-yIGIc-BSEisySs';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
     document.addEventListener("DOMContentLoaded", () => {
-      // Initialisiere Supabase hier, nachdem der DOM geladen wurde
-      const supabaseUrl = 'https://vxwkrjmyuxxunyzkocnt.supabase.co';
-      const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4d2tyam15dXh4dW55emtvY250Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwMjMwNDQsImV4cCI6MjA2MTU5OTA0NH0.SA-zVGHZlxvFcHSvFFg2w7V0dT_e-yIGIc-BSEisySs';  // Dein Supabase Key
-
-      // Jetzt erstellen wir den Supabase-Client
-      const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
       const searchInput = document.querySelector(".search-input");
       const gameGrid = document.getElementById("gameGrid");
       const addButton = document.querySelector('.add-button');
@@ -244,9 +207,11 @@
         });
       });
 
-      loadGames(); // Lade die Spiele nach dem Initialisieren von Supabase
+      loadGames();
     });
   </script>
 
 </body>
+
 </html>
+
